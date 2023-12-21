@@ -1,6 +1,7 @@
 package com.douglas.develop.radio.config;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import static org.springframework.security.config.Customizer.withDefaults;
+
 import org.springframework.boot.web.servlet.ServletListenerRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
@@ -18,11 +19,13 @@ import org.springframework.security.web.session.HttpSessionEventPublisher;
 import com.douglas.develop.radio.domain.PerfilTipo;
 import com.douglas.develop.radio.service.UsuarioService;
 
+import lombok.AllArgsConstructor;
+
 @EnableGlobalMethodSecurity(prePostEnabled = true)
 @EnableWebSecurity
+@AllArgsConstructor
 public class SecurityConfig extends WebSecurityConfigurerAdapter{
-
-	@Autowired
+	
 	private UsuarioService service;
 	
 	@Override
@@ -31,64 +34,60 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter{
 		final String ADMIN = PerfilTipo.ADMIN.getDesc();
 		final String MEDICO = PerfilTipo.MEDICO.getDesc();
 		final String PACIENTE = PerfilTipo.PACIENTE.getDesc();
-		
-		http.authorizeRequests()
-			.antMatchers("/webjars/**", "/css/**", "/image/**", "/js/**").permitAll()
-			.antMatchers("/", "/home", "/expired").permitAll()
-			.antMatchers("/u/novo/cadastro", "/u/cadastro/realizado", "/u/cadastro/paciente/salvar").permitAll()
-			.antMatchers("/u/confirmacao/cadastro").permitAll()
-			.antMatchers("/u/p/**").permitAll()
-			
-			// acessos privados admin
-			.antMatchers("/u/editar/senha", "/u/confirmar/senha").hasAnyAuthority(PACIENTE, MEDICO)
-			.antMatchers("/u/**").hasAuthority(ADMIN)
-			
-			// acessos privados medicos
-			.antMatchers("/medicos/especialidade/titulo/*").hasAnyAuthority(PACIENTE, MEDICO)
-			.antMatchers("/medicos/dados", "/medicos/salvar", "/medicos/editar").hasAnyAuthority(MEDICO, ADMIN)
-			.antMatchers("/medicos/**").hasAuthority(MEDICO)
-			
-			// acessos privados pacientes
-			.antMatchers("/pacientes/**").hasAuthority(PACIENTE)
-			
-			// acessos privados especialidades
-			.antMatchers("/especialidades/datatables/server/medico/*").hasAnyAuthority(MEDICO, ADMIN)
-			.antMatchers("/especialidades/titulo").hasAnyAuthority(MEDICO, ADMIN, PACIENTE)
-			.antMatchers("/especialidades/**").hasAuthority(ADMIN)
-			
-			// acessos privados albuns
-			.antMatchers("/albuns/datatables/server/medico/*").hasAnyAuthority(MEDICO, ADMIN)
-			.antMatchers("/albuns/titulo").hasAnyAuthority(MEDICO, ADMIN, PACIENTE)
-			.antMatchers("/albuns/**").hasAuthority(ADMIN)
-			
-			.anyRequest().authenticated()
-			.and()
-				.formLogin()
-				.loginPage("/login")
-				.defaultSuccessUrl("/", true)
-				.failureUrl("/login-error")
-				.permitAll()
-			.and()
-				.logout()
-				.logoutSuccessUrl("/")
-				.deleteCookies("JSESSIONID")
-			.and()
-				.exceptionHandling()
-				.accessDeniedPage("/acesso-negado")
-			.and()
-				.rememberMe();
-		
-		http.sessionManagement()
-			.maximumSessions(1)
-			.expiredUrl("/expired")
-			.maxSessionsPreventsLogin(false) // mudar para true para somente um dispositivo
-			.sessionRegistry(sessionRegistry());
-		
-		//comentar este bloco para impedir logim em dois dispositivos
-		http.sessionManagement()
-			.sessionFixation()
-			.newSession()
-			.sessionAuthenticationStrategy(sessionAuthtrategy());
+
+        http.authorizeRequests(requests -> requests
+                .antMatchers("/webjars/**", "/css/**", "/image/**", "/js/**").permitAll()
+                .antMatchers("/", "/home", "/expired").permitAll()
+                .antMatchers("/u/novo/cadastro", "/u/cadastro/realizado", "/u/cadastro/paciente/salvar").permitAll()
+                .antMatchers("/u/confirmacao/cadastro").permitAll()
+                .antMatchers("/u/p/**").permitAll()
+
+                // acessos privados admin
+                .antMatchers("/u/editar/senha", "/u/confirmar/senha").hasAnyAuthority(PACIENTE, MEDICO)
+                .antMatchers("/u/**").hasAuthority(ADMIN)
+
+                // acessos privados medicos
+                .antMatchers("/medicos/especialidade/titulo/*").hasAnyAuthority(PACIENTE, MEDICO)
+                .antMatchers("/medicos/dados", "/medicos/salvar", "/medicos/editar").hasAnyAuthority(MEDICO, ADMIN)
+                .antMatchers("/medicos/**").hasAuthority(MEDICO)
+
+                // acessos privados pacientes
+                .antMatchers("/pacientes/**").hasAuthority(PACIENTE)
+
+                // acessos privados especialidades
+                .antMatchers("/especialidades/datatables/server/medico/*").hasAnyAuthority(MEDICO, ADMIN)
+                .antMatchers("/especialidades/titulo").hasAnyAuthority(MEDICO, ADMIN, PACIENTE)
+                .antMatchers("/especialidades/**").hasAuthority(ADMIN)
+
+                // acessos privados albuns
+                .antMatchers("/albuns/datatables/server/medico/*").hasAnyAuthority(MEDICO, ADMIN)
+                .antMatchers("/albuns/titulo").hasAnyAuthority(MEDICO, ADMIN, PACIENTE)
+                .antMatchers("/albuns/**").hasAuthority(ADMIN)
+
+                .anyRequest().authenticated())
+                .formLogin(login -> login
+                        .loginPage("/login")
+                        .defaultSuccessUrl("/", true)
+                        .failureUrl("/login-error")
+                        .permitAll())
+                .logout(logout -> logout
+                        .logoutSuccessUrl("/")
+                        .deleteCookies("JSESSIONID"))
+                .exceptionHandling(handling -> handling
+                        .accessDeniedPage("/acesso-negado"))
+                .rememberMe(withDefaults());
+
+        http.sessionManagement(management -> management
+                .maximumSessions(1)
+                .expiredUrl("/expired")
+                .maxSessionsPreventsLogin(false) // mudar para true para somente um dispositivo
+                .sessionRegistry(sessionRegistry()));
+
+        //comentar este bloco para impedir logim em dois dispositivos
+        http.sessionManagement(management -> management
+                .sessionFixation()
+                .newSession()
+                .sessionAuthenticationStrategy(sessionAuthtrategy()));
 		//--------------------------------------------------------------
 	}
 

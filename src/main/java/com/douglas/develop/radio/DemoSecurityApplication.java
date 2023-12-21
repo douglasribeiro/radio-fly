@@ -22,9 +22,6 @@ public class DemoSecurityApplication implements CommandLineRunner {
 		SpringApplication.run(DemoSecurityApplication.class, args);
 	}
 	
-	//@Autowired
-	//private JavaMailSender sender;
-	
 	private final EmailService service;
 
 	@Override
