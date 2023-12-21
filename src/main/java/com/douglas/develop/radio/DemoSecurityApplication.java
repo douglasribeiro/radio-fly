@@ -8,8 +8,11 @@ import org.springframework.cloud.openfeign.EnableFeignClients;
 
 import com.douglas.develop.radio.service.EmailService;
 
+import lombok.AllArgsConstructor;
+
 @EnableFeignClients
 @SpringBootApplication
+@AllArgsConstructor
 public class DemoSecurityApplication implements CommandLineRunner {
 
 	public static void main(String[] args) {
@@ -22,8 +25,7 @@ public class DemoSecurityApplication implements CommandLineRunner {
 	//@Autowired
 	//private JavaMailSender sender;
 	
-	@Autowired
-	private EmailService service;
+	private final EmailService service;
 
 	@Override
 	public void run(String... args) throws Exception {
