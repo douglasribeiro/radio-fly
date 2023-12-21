@@ -6,7 +6,6 @@ import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -19,14 +18,15 @@ import com.douglas.develop.radio.exception.AcessoNegadoException;
 import com.douglas.develop.radio.repository.AgendamentoRepository;
 import com.douglas.develop.radio.repository.projection.HistoricoPaciente;
 
+import lombok.AllArgsConstructor;
+
 @Service
+@AllArgsConstructor
 public class AgendamentoService {
 
-	@Autowired
-	private AgendamentoRepository repository;
+	private final  AgendamentoRepository repository;
 	
-	@Autowired
-	private Datatables datatables;
+	private final Datatables datatables;
 	
 	@Transactional(readOnly = true)
 	public List<Horario> buscarHorariosNaoAgendadosPorMedicoIdEData(Long id, LocalDate data) {

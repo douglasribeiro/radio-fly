@@ -4,7 +4,6 @@ import java.time.LocalDate;
 
 import javax.servlet.http.HttpServletRequest;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.format.annotation.DateTimeFormat.ISO;
 import org.springframework.http.ResponseEntity;
@@ -28,18 +27,18 @@ import com.douglas.develop.radio.service.AgendamentoService;
 import com.douglas.develop.radio.service.EspecialidadeService;
 import com.douglas.develop.radio.service.PacienteService;
 
+import lombok.AllArgsConstructor;
+
 @Controller
 @RequestMapping("agendamentos")
+@AllArgsConstructor
 public class AgendamentoController {
 	
-	@Autowired
-	private AgendamentoService service;
+	private final AgendamentoService service;
 	
-	@Autowired
-	private PacienteService pacienteService;
+	private final PacienteService pacienteService;
 	
-	@Autowired
-	private EspecialidadeService especialidadeService;
+	private final EspecialidadeService especialidadeService;
 
 	@PreAuthorize("hasAnyAuthority('PACIENTE', 'MEDICO')")
 	@GetMapping("/agendar")
